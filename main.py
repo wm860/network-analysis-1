@@ -3,6 +3,7 @@ import random
 from collections import Counter
 import numpy as np
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
 
 def read_graph(filename):
     G = nx.MultiGraph() # Tworzenie grafu
@@ -11,36 +12,193 @@ def read_graph(filename):
             edge = tuple(map(int, line.split()))  # Rozdzielanie liczby na krawędziach
             G.add_edge(*edge)  # Dodawanie krawędzi do grafu
     return G
-def graph_info(G,a):
-    print ("Zadanie "+a)
+def graph_info(G):
     print("Liczba węzłów w przekazanym grafie:", G.number_of_nodes())
     print("Liczba krawędzi w przekazanym grafie:", G.number_of_edges())
 def largest_connected_graph(G):
      # Stwórz nowy graf zawierający tylko największą składową spójną
-
-
     return largest_connected_component
+
 if __name__ == '__main__':
 # 1a)
+    print("Zadanie 1a")
     original_graph = read_graph('2.txt') #wczytanie grafu z pliku
-    graph_info(original_graph,'1a') #wypisanie liczby wezlow i liczby krawedzi
+    graph_info(original_graph) #wypisanie liczby wezlow i liczby krawedzi
 # 1b)
+    print("\nZadanie 1b")
     reduced_graph = nx.Graph(original_graph) #usunięcie liczby wezlow
     reduced_graph.remove_edges_from(nx.selfloop_edges(original_graph)) #usunięcie pętli
-    graph_info(reduced_graph,'1b')  # wypisanie liczby wezlow i liczby krawedzi
+    graph_info(reduced_graph)  # wypisanie liczby wezlow i liczby krawedzi
 
 # 2)
+    print("\nZadanie 2")
     largest_connected_component = reduced_graph.subgraph(max(nx.connected_components(reduced_graph), key=len))
-    graph_info(largest_connected_component,'2')  # wypisanie liczby wezlow i liczby krawedzi
+    graph_info(largest_connected_component)  # wypisanie liczby wezlow i liczby krawedzi
 # 3)
+    print("\nZadanie 3 ")
     probs = [100,1000,10000]
     paths = []
-    for prob in probs:
-        for i in range(prob):
-            random_nodes = random.sample(list(largest_connected_component.nodes()), 2)
-            start_node, end_node = random_nodes
-            path = nx.shortest_path_length(largest_connected_component, start_node, end_node)
-            #print(path)
-            paths.append(path)
-        average_path_length = sum(paths) / prob
-        print(f"próba {prob} średnia długość ścieżki {average_path_length:.2f}")
+#    for prob in probs:
+#        for i in range(prob):
+#            random_nodes = random.sample(list(largest_connected_component.nodes()), 2)
+#            start_node, end_node = random_nodes
+#            path = nx.shortest_path_length(largest_connected_component, start_node, end_node)
+#            paths.append(path)
+#        average_path_length = sum(paths) / prob
+#        print(f"próba {prob} średnia długość ścieżki {average_path_length:.2f}")
+# 4)
+    print("\nZadanie 4 ")
+    core_numbers = nx.core_number(reduced_graph) #zwroci słownik -> liczbe wszystkich rdzeni w grafie, możliwa do usyzkania
+    max_core_number = max(core_numbers.values())
+    core_numbers_list = list(sorted(Counter(core_numbers.values()).items(), reverse=True))
+    print(f"Rdzeni o największym możliwym rzędzie - {core_numbers_list[0][0]} jest {core_numbers_list[0][1]}")
+    print(f"Rdzeni o drugiej największym możliwym rzędzie - {core_numbers_list[1][0]} jest {core_numbers_list[0][1]+core_numbers_list[1][1]}")
+    print(f"Rdzeni o trzecim największym możliwym rzędzie - {core_numbers_list[2][0]} jest {core_numbers_list[0][1]+core_numbers_list[1][1]+core_numbers_list[2][1]}")
+# 5)
+    print("\nZadanie 5 ")
+    degrees = dict(reduced_graph.degree()) #degrees = (node,degree)
+    values_degrees = list(degrees.values()) #zebrane stopnie wezlow
+    values_degrees_counted = (Counter(values_degrees)) #(stopien, liczba wystapien wezlow o danymstopniu)
+    deg, num = zip(*values_degrees_counted.items())
+
+    plt.plot(deg, num, '.')
+    plt.title("Rozkład stopni wierzchołków")
+    plt.xlabel("Stopień wierzchołka")
+    plt.ylabel("Liczba wierzchołków o danym stopniu")
+    plt.savefig('wyk1.png')
+    plt.show()
+
+    plt.loglog(deg, num, '.')
+    plt.title("Rozkład stopni wierzchołków w skali podwójnie logarytmicznej")
+    plt.xlabel("Stopień wierzchołka")
+    plt.ylabel("Liczba wierzchołków o danym stopniu")
+    plt.savefig('wyk2.png')
+    plt.show()
+
+# 6)
+    print("\nZadanie 6 ")
+    bins = np.logspace(np.log10(min(values_degrees)), np.log10(max(values_degrees)), 20)
+    node6, degree6 = np.histogram(values_degrees, bins=bins)    #rozlokowanie logarytmiczne przedzialow
+#node6 oraz degree6 mają różną liczność
+    plt.loglog(degree6[:-1], node6, 'o')
+    plt.xlabel("Stopień wierzchołka")
+    plt.ylabel("Liczba wierzchołków o danym stopniu")
+    plt.title("Rozkład stopni wierzchołków w skali podwójnie logarytmicznej\n"
+              " z przedziałami rozlokowanymi logarytmicznie")
+    plt.grid(True, which='both', axis='both', linestyle='--', linewidth=0.5, color='gray')
+    plt.savefig('wyk3.png')
+    plt.show()
+
+    node6 = np.append(node6, 0)  # poniewaz nie zgadza sie liczba node6 i degree6
+    cumulative_distribution = np.cumsum(node6) / np.sum(node6) #dystrybuanta
+    complementary_cumulative_distribution = 1 - cumulative_distribution #dopelnienie dystrybuanty
+
+    plt.loglog(degree6, complementary_cumulative_distribution, 'o')
+    plt.title(
+        "Dopełnienie dystrybuant rozkładu stopni wierzchołków")
+    plt.xlabel("Stopień wierzchołka")
+    plt.ylabel("Liczba wierzchołków o danym stopniu")
+    plt.grid(True, which='both', axis='both', linestyle='--', linewidth=0.5, color='gray')
+    plt.savefig('wyk4.png')
+    plt.show()
+
+    zeros = np.where(complementary_cumulative_distribution == 0)[0]  #konieczność usunięcia wartosci 0 do wykorzystania funkcji polyfit i zadbania aby x i y byly rownoliczne
+    xx = np.delete(degree6,zeros)
+    yy = np.delete(complementary_cumulative_distribution, zeros)
+
+    coefs = np.polyfit(np.log10(xx), np.log10(yy), 1)   #wspolczynniki regresjii dla wykresu podwojnie logarytmicznego
+    y = 10 ** (np.log10(xx) * coefs[0] + coefs[1]) # podnosze do potegi ze wzgledu na to, ze potem przy rysowaniu brany jest logarytm
+
+    plt.loglog(degree6, complementary_cumulative_distribution, 'o')
+    plt.loglog(xx, y, color='red')
+    plt.title(
+        "Dopełnienie dystrybuant wraz z naniesioną krzywą regresjii")
+    plt.xlabel("Stopień wierzchołka")
+    plt.ylabel("Liczba wierzchołków o danym stopniu")
+    plt.grid(True, which='both', axis='both', linestyle='--', linewidth=0.5, color='gray')
+    plt.savefig('wyk5.png')
+    plt.show()
+
+    print("Wykładnik rozkładu potęgowego:", -coefs[0])
+
+'''
+
+
+
+    
+
+
+
+
+
+
+
+# 6c)
+    complementary_cumulative = np.sum(node6) - np.cumsum(node6)
+    plt.loglog(degree6, complementary_cumulative, 'o')
+    plt.title(
+        "Rozkład stopni wierzchołków (dopełnienie dystrybuanty) w skali \n podwójnie logarytmicznej "
+        "z przedziałami rozłożonymi logarytmicznie")
+    plt.xlabel("Stopień wierzchołka")
+    plt.ylabel("Liczba wierzchołków")
+    plt.savefig('wyk_inny.png')
+    plt.show()
+''''''
+
+
+# # Przykładowe dane - zastąp je danymi z twojego grafu
+# degrees = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+# degree_distribution = np.array([5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
+#
+# # Oblicz dystrybuantę
+# cumulative_distribution = np.cumsum(degree_distribution) / np.sum(degree_distribution)
+#
+# # Dopełnienie dystrybuanty
+# complementary_cumulative_distribution = 1 - cumulative_distribution
+#
+# # Przygotuj przedziały rozlokowane logarytmicznie
+# log_degrees = np.log(degrees)
+# log_complementary_cumulative_distribution = np.log(complementary_cumulative_distribution)
+#
+# # Przeprowadź regresję liniową w skali log-log
+# X = log_degrees.reshape(-1, 1)
+# y = log_complementary_cumulative_distribution
+# regression = LinearRegression().fit(X, y)
+#
+# # Wartość współczynnika m to wykładnik rozkładu potęgowego
+# exponent = -regression.coef_[0]
+#
+# print("Wykładnik rozkładu potęgowego:", exponent)
+
+# 6c)
+    print("\nZadanie 6c ")
+    degrees = [degree for node, degree in reduced_graph.degree()]
+    node, degree = np.histogram(degrees, max(degrees))
+    node = np.append(node, 0)
+    complementary_cumulative = np.sum(node) - np.cumsum(node)
+
+    plt.loglog(degree, complementary_cumulative, 'o')
+    plt.title(
+        "Rozkład stopni wierzchołków (dopełnienie dystrybuanty) w skali \n podwójnie logarytmicznej "
+        "z przedziałami rozłożonymi logarytmicznie")
+    plt.xlabel("Stopień wierzchołka")
+    plt.ylabel("Liczba wierzchołków")
+
+    degree = np.array(degree)
+    complementary_cumulative = np.array(complementary_cumulative)
+
+    zero_indices = np.where(complementary_cumulative == 0)[0]
+
+    degree = np.delete(degree, zero_indices)
+    complementary_cumulative = np.delete(complementary_cumulative, zero_indices)
+
+    fit = np.polyfit(np.log10(degree), np.log10(complementary_cumulative), 1)
+
+    xr = degree
+    yr = 10 ** (np.log10(degree) * fit[0] + fit[1])
+    print("y(x) = x * ({}) + {}".format(fit[0], fit[1]))
+
+    plt.loglog(xr, yr, 'g-')
+    #plt.show()
+
+'''
