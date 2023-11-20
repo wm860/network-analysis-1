@@ -38,14 +38,14 @@ if __name__ == '__main__':
     print("\nZadanie 3 ")
     probs = [100,1000,10000]
     paths = []
-#    for prob in probs:
-#        for i in range(prob):
-#            random_nodes = random.sample(list(largest_connected_component.nodes()), 2)
-#            start_node, end_node = random_nodes
-#            path = nx.shortest_path_length(largest_connected_component, start_node, end_node)
-#            paths.append(path)
-#        average_path_length = sum(paths) / prob
-#        print(f"próba {prob} średnia długość ścieżki {average_path_length:.2f}")
+    for prob in probs:
+        for i in range(prob):
+            random_nodes = random.sample(list(largest_connected_component.nodes()), 2)
+            start_node, end_node = random_nodes
+            path = nx.shortest_path_length(largest_connected_component, start_node, end_node)
+            paths.append(path)
+        average_path_length = sum(paths) / prob
+        print(f"próba {prob} średnia długość ścieżki {average_path_length:.2f}")
 # 4)
     print("\nZadanie 4 ")
     core_numbers = nx.core_number(reduced_graph) #zwroci słownik -> liczbe wszystkich rdzeni w grafie, możliwa do usyzkania
@@ -124,113 +124,24 @@ if __name__ == '__main__':
 # 7)
     print("\nZadanie 7 ")
 
-#chyba trzeba dać inny wektor do sortowania!!!
     d = sorted(values_degrees) #wszystkie stopnie dla kazdego wierzcholka
-    # sorted(values_degrees)
-    # print(d1)
-    # d2 = sorted(deg)
-    # print(d2)
-
-    k = 10
     N = len(d)
     gamma = np.ones(len(d)-1)
-
-    for k in range(1,len(d)): #bo k nie moze byc w mianowniku
+    for k in range(1,len(d)): #bo k nie moze byc 0 bo jest w mianowniku
         gamma[k-1] = (1/k)*np.sum(np.log(d[(N-k-1):])-np.log(d[N-k-1]))
-
     alfa = 1 + 1/gamma
-    print("ALFA ", alfa)
+
     plt.plot(alfa)
-    plt.title("Wykres Hilla dla k = [1, {}]".format(N))
-    plt.ylabel("alfa - estymator Hilla")
-    plt.xlabel("k - liczba uwzględnionych końcowych próbek")
+    plt.ylabel("alfa(k)")
+    plt.xlabel("k")
+    plt.title("Wykres Hilla")
     plt.savefig('wyk6-hilla.png')
     plt.show()
 
-
-    #print(deg)
-    #print(values_degrees)
-    #alfa = 1+gamma
-
-
-'''
-
-
-
-    
-
-
-
-
-
-
-
-# 6c)
-    complementary_cumulative = np.sum(node6) - np.cumsum(node6)
-    plt.loglog(degree6, complementary_cumulative, 'o')
-    plt.title(
-        "Rozkład stopni wierzchołków (dopełnienie dystrybuanty) w skali \n podwójnie logarytmicznej "
-        "z przedziałami rozłożonymi logarytmicznie")
-    plt.xlabel("Stopień wierzchołka")
-    plt.ylabel("Liczba wierzchołków")
-    plt.savefig('wyk_inny.png')
+    print("ALFA ", alfa[50:])
+    plt.plot(alfa[40:])
+    plt.ylabel("alfa(k)")
+    plt.xlabel("k")
+    plt.title("Wykres Hilla")
+    plt.savefig('wyk7-hilla.png')
     plt.show()
-''''''
-
-
-# # Przykładowe dane - zastąp je danymi z twojego grafu
-# degrees = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-# degree_distribution = np.array([5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
-#
-# # Oblicz dystrybuantę
-# cumulative_distribution = np.cumsum(degree_distribution) / np.sum(degree_distribution)
-#
-# # Dopełnienie dystrybuanty
-# complementary_cumulative_distribution = 1 - cumulative_distribution
-#
-# # Przygotuj przedziały rozlokowane logarytmicznie
-# log_degrees = np.log(degrees)
-# log_complementary_cumulative_distribution = np.log(complementary_cumulative_distribution)
-#
-# # Przeprowadź regresję liniową w skali log-log
-# X = log_degrees.reshape(-1, 1)
-# y = log_complementary_cumulative_distribution
-# regression = LinearRegression().fit(X, y)
-#
-# # Wartość współczynnika m to wykładnik rozkładu potęgowego
-# exponent = -regression.coef_[0]
-#
-# print("Wykładnik rozkładu potęgowego:", exponent)
-
-# 6c)
-    print("\nZadanie 6c ")
-    degrees = [degree for node, degree in reduced_graph.degree()]
-    node, degree = np.histogram(degrees, max(degrees))
-    node = np.append(node, 0)
-    complementary_cumulative = np.sum(node) - np.cumsum(node)
-
-    plt.loglog(degree, complementary_cumulative, 'o')
-    plt.title(
-        "Rozkład stopni wierzchołków (dopełnienie dystrybuanty) w skali \n podwójnie logarytmicznej "
-        "z przedziałami rozłożonymi logarytmicznie")
-    plt.xlabel("Stopień wierzchołka")
-    plt.ylabel("Liczba wierzchołków")
-
-    degree = np.array(degree)
-    complementary_cumulative = np.array(complementary_cumulative)
-
-    zero_indices = np.where(complementary_cumulative == 0)[0]
-
-    degree = np.delete(degree, zero_indices)
-    complementary_cumulative = np.delete(complementary_cumulative, zero_indices)
-
-    fit = np.polyfit(np.log10(degree), np.log10(complementary_cumulative), 1)
-
-    xr = degree
-    yr = 10 ** (np.log10(degree) * fit[0] + fit[1])
-    print("y(x) = x * ({}) + {}".format(fit[0], fit[1]))
-
-    plt.loglog(xr, yr, 'g-')
-    #plt.show()
-
-'''
