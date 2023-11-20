@@ -3,8 +3,6 @@ import random
 from collections import Counter
 import numpy as np
 from matplotlib import pyplot as plt
-from sklearn.linear_model import LinearRegression
-
 def read_graph(filename):
     G = nx.MultiGraph() # Tworzenie grafu
     with open(filename, 'r') as file:
@@ -15,9 +13,6 @@ def read_graph(filename):
 def graph_info(G):
     print("Liczba węzłów w przekazanym grafie:", G.number_of_nodes())
     print("Liczba krawędzi w przekazanym grafie:", G.number_of_edges())
-def largest_connected_graph(G):
-     # Stwórz nowy graf zawierający tylko największą składową spójną
-    return largest_connected_component
 
 if __name__ == '__main__':
 # 1a)
@@ -26,7 +21,7 @@ if __name__ == '__main__':
     graph_info(original_graph) #wypisanie liczby wezlow i liczby krawedzi
 # 1b)
     print("\nZadanie 1b")
-    reduced_graph = nx.Graph(original_graph) #usunięcie liczby wezlow
+    reduced_graph = nx.Graph(original_graph) #usunięcie duplikatow
     reduced_graph.remove_edges_from(nx.selfloop_edges(original_graph)) #usunięcie pętli
     graph_info(reduced_graph)  # wypisanie liczby wezlow i liczby krawedzi
 
@@ -136,12 +131,4 @@ if __name__ == '__main__':
     plt.xlabel("k")
     plt.title("Wykres Hilla")
     plt.savefig('wyk6-hilla.png')
-    plt.show()
-
-    print("ALFA ", alfa[50:])
-    plt.plot(alfa[40:])
-    plt.ylabel("alfa(k)")
-    plt.xlabel("k")
-    plt.title("Wykres Hilla")
-    plt.savefig('wyk7-hilla.png')
     plt.show()
