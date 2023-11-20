@@ -79,8 +79,8 @@ if __name__ == '__main__':
     print("\nZadanie 6 ")
     bins = np.logspace(np.log10(min(values_degrees)), np.log10(max(values_degrees)), 20)
     node6, degree6 = np.histogram(values_degrees, bins=bins)    #rozlokowanie logarytmiczne przedzialow
-#node6 oraz degree6 mają różną liczność
-    plt.loglog(degree6[:-1], node6, 'o')
+
+    plt.loglog(degree6[:-1], node6, 'o') #node6 oraz degree6 mają różną liczność
     plt.xlabel("Stopień wierzchołka")
     plt.ylabel("Liczba wierzchołków o danym stopniu")
     plt.title("Rozkład stopni wierzchołków w skali podwójnie logarytmicznej\n"
@@ -120,6 +120,38 @@ if __name__ == '__main__':
     plt.show()
 
     print("Wykładnik rozkładu potęgowego:", -coefs[0])
+
+# 7)
+    print("\nZadanie 7 ")
+
+#chyba trzeba dać inny wektor do sortowania!!!
+    d = sorted(values_degrees) #wszystkie stopnie dla kazdego wierzcholka
+    # sorted(values_degrees)
+    # print(d1)
+    # d2 = sorted(deg)
+    # print(d2)
+
+    k = 10
+    N = len(d)
+    gamma = np.ones(len(d)-1)
+
+    for k in range(1,len(d)): #bo k nie moze byc w mianowniku
+        gamma[k-1] = (1/k)*np.sum(np.log(d[(N-k-1):])-np.log(d[N-k-1]))
+
+    alfa = 1 + 1/gamma
+    print("ALFA ", alfa)
+    plt.plot(alfa)
+    plt.title("Wykres Hilla dla k = [1, {}]".format(N))
+    plt.ylabel("alfa - estymator Hilla")
+    plt.xlabel("k - liczba uwzględnionych końcowych próbek")
+    plt.savefig('wyk6-hilla.png')
+    plt.show()
+
+
+    #print(deg)
+    #print(values_degrees)
+    #alfa = 1+gamma
+
 
 '''
 
