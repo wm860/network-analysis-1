@@ -1,0 +1,8 @@
+Projekt dotyczący analizy sieci społecznej z wykorzystaniem biblioteki networkx
+
+1.	Zbadano rząd i rozmiar całej sieci pierwotnej.
+2.	Wyodrębniono największą składową spójną.
+3.	Wyznaczono aproksymację średniej długości ścieżki, operując na próbie losowej.
+4.	Wyznaczono liczbę rdzeni dla każdego węzła.
+5.	Wykreślono rozkład stopni wierzchołków.
+6.	Wyznaczono wykładnik rozkładu potęgowego metodą regresji dla dopełnienia dystrybuanty rozkładu stopni, dla przedziałów rozlokowanych logarytmicznie
