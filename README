@@ -1,5 +1,6 @@
-Projekt dotyczący analizy sieci społecznej z wykorzystaniem biblioteki networkx
+Projekt dotyczący analizy sieci społecznej z wykorzystaniem biblioteki networkx.
 
+Zrealizowane zadania:
 1.	Zbadano rząd i rozmiar całej sieci pierwotnej.
 2.	Wyodrębniono największą składową spójną.
 3.	Wyznaczono aproksymację średniej długości ścieżki, operując na próbie losowej.
